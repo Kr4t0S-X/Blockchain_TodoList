@@ -1,14 +1,26 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
 #include "openssl/crypto.h"
+
+//#define SHA256_DIGEST_LENGTH	32
 
 struct block
 {
-	unsigned char hash[SHA256_DIGEST_LENGTH];
-	int data;
+	unsigned char prevHash[SHA256_DIGEST_LENGTH];
+	int blockData;
 	struct block *link;
 }*head;
+
+void addBlock(int);
+void verifyChain();
+void alterNthBlock(int,int);
+void hackChain();
+int hashCompare(unsigned char*,unsigned char*);
+void hashPrinter();
+unsigned char *toString(struct block);
+void printBlock(struct block*);
+void printAllBlocks();
 
 // SHA256(src, size, dest)
 // src and dest are of type unsigned char *
@@ -35,21 +47,21 @@ void verifyChain()
 {
 	if(!head)
 	{
-		fprintf("Blockchain is empty! Try again after adding some blocks!\n");
+		printf("Blockchain is empty! Try again after adding some blocks!\n");
 		return;
 	}
 	struct block *curr=head->link,*prev=head;
 	int count=1;
 	while(curr)
 	{
-		fprintf("%d\t[%d]\t", count++, curr->blockData);
+		printf("%d\t[%d]\t", count++, curr->blockData);
 		hashPrinter(SHA256(toString(*prev),sizeof(*prev), NULL)SHA256_DIGEST_LENGTH);
-		fprintf(" - ");
+		printf(" - ");
 		hashPrinter(curr->prevHash,SHA256_DIGEST_LENGTH);
 		if(hashCompare(SHA256(toString(*prev),sizeof(*prev),NULL),curr->prevHash);
-			fprint("Verified!\n");
+			printf("Verified!\n");
 		else
-			fprintf("Verification Failed!\n");
+			printf("Verification Failed!\n");
 		prev=curr;
 		curr=curr->link;
 	}
@@ -58,16 +70,18 @@ void verifyChain()
 void alterNthBlock(int n, int newData)
 {
 	struct block *curr=head;
+	int count=0;
+
 	if (!curr)
 	{
-		fprintf("Nth block does not exist!\n");
+		printf("Nth block does not exist!\n");
 		return;
 	}
 	while(count!=n)
 	{
 		if(!curr->link && count!=n)
 		{
-			fprintf("Nth block does not exist!\n");
+			printf("Nth block does not exist!\n");
 			return;
 		}
 		else if (count==n)
@@ -75,20 +89,20 @@ void alterNthBlock(int n, int newData)
 		curr=curr->link;
 		count++;
 	}
-	fprintf("Before: ");
+	printf("Before: ");
 	printBlock(curr);
 	curr->blockData=newData;
-	fprintf("\nAfter: ")
+	printf("\nAfter: ");
 		printBlock(curr);
-	fprintf("\n");
+	printf("\n");
 }
 
 void hackChain()
 {
-	struct block *curr=head;*prev;
+	struct block *curr=head,*prev;
 	if(!curr)
 	{
-		fprintf("BlockChain is empty!\n");
+		printf("BlockChain is empty!\n");
 		return;
 	}
 	while (1)
@@ -103,7 +117,7 @@ void hackChain()
 					SHA256(toString(*prev),sizeof(*prev),curr->prevHash),
 					SHA256_DIGEST_LENGTH
 			);
-			fprintf("\n");
+			printf("\n");
 		}
 	}
 }
@@ -117,8 +131,8 @@ unsigned char* toString(struct block b)
 
 void hashPrinter(unsigned char hash[], int length)
 {
-	for(int i=0,i<length;i++)
-		fprintf("%02x",hash[i]);
+	for(int i=0;i<length;i++)
+		printf("%02x",hash[i]);
 }
 
 int hashCompare(unsigned char *str1, unsigned char *str2)
@@ -127,15 +141,14 @@ int hashCompare(unsigned char *str1, unsigned char *str2)
 		if(str1[i]!=str2[i])
 			return(0);
 		return(1);
-	}
 }
 
 void printBlock(struct block *b)
 {
-	fprintf("%p]t",b);
+	printf("%p]t",b);
 	hashPrinter(b->prevHash,sizeof(b->prevHash));
-	fprintf("\t[%d]\t,b->blockData");
-	fprintf("%p\n,b->link");
+	printf("\t[%d]\t",b->blockData);
+	printf("%p\n",b->link);
 }
 
 void printAllBlocks()
@@ -152,33 +165,33 @@ void printAllBlocks()
 int main()
 {
 	int c,n,r;
-	fprintf("1. addBlock\n2. add N random blocks\n3.alter Nth Block\n4. printAllBlocks\n5. verifyChain\n6. hackChain\n");
+	printf("1. addBlock\n2. add N random blocks\n3.alter Nth Block\n4. printAllBlocks\n5. verifyChain\n6. hackChain\n");
 	while(1)
 	{
-		fprintf("Choice: ");
-		fscanf("%d",&c);
-		switch(c);
+		printf("Choice: ");
+		scanf("%d",&c);
+		switch(c)
 		{
 			case 1:
-				fprint("Enter data: ");
-				fscanf("%d",&n);
+				printf("Enter data: ");
+				scanf("%d",&n);
 				addBlock(n);
 				break;
 			case 2:
-				fprintf("How many blocks to enter?: ");
-				fscanf("%d", &n);
+				printf("How many blocks to enter?: ");
+				scanf("%d", &n);
 				for (int i=0;i<n;i++)
 				{
 					r=rand()%(n*10);
-					fprintf("Entering: %d\n",r);
+					printf("Entering: %d\n",r);
 					addBlock(r);
 				}
 				break;
 			case 3:
-				fprintf("Which block to alter?: ");
-				fscanf("%d",&n);
-				fprintf("Enter value: ");
-				fscanf("%d",&r);
+				printf("Which block to alter?: ");
+				scanf("%d",&n);
+				printf("Enter value: ");
+				scanf("%d",&r);
 				alterNthBlock(n,r);
 				break;
 			case 4:
@@ -191,7 +204,7 @@ int main()
 				hackChain();
 				break;
 			default:
-				fprintf("Wrong Choice!");
+				printf("Wrong Choice!");
 				break;
 		}
 	}
