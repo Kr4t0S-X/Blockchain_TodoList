@@ -1,9 +1,10 @@
+#include "libc.h"
 #include "stdio.h"
 #include "string.h"
 #include "stdlib.h"
 #include "openssl/crypto.h"
 
-//#define SHA256_DIGEST_LENGTH	32
+#define SHA256_DIGEST_LENGTH 32
 
 struct block
 {
@@ -16,7 +17,7 @@ void addBlock(int);
 void verifyChain();
 void alterNthBlock(int,int);
 void hackChain();
-int hashCompare(unsigned char*,unsigned char*);
+int hashCompare(unsigned char *, unsigned char *);
 void hashPrinter();
 unsigned char *toString(struct block);
 void printBlock(struct block*);
@@ -40,7 +41,7 @@ void addBlock(int data)
 	struct block *newBlock=malloc(sizeof(struct block));
 	currentBlock->link=newBlock;
 	newBlock->blockData=data;
-	SHA256(toString(*currentBlock),sizeof(*currentBlock),newBlock->prevHash)
+	SHA256(toString(*currentBlock),sizeof(*currentBlock),newBlock->prevHash);
 }
 
 void verifyChain()
@@ -55,10 +56,10 @@ void verifyChain()
 	while(curr)
 	{
 		printf("%d\t[%d]\t", count++, curr->blockData);
-		hashPrinter(SHA256(toString(*prev),sizeof(*prev), NULL)SHA256_DIGEST_LENGTH);
+		hashPrinter(SHA256(toString(*prev),sizeof(*prev), NULL),SHA256_DIGEST_LENGTH);
 		printf(" - ");
 		hashPrinter(curr->prevHash,SHA256_DIGEST_LENGTH);
-		if(hashCompare(SHA256(toString(*prev),sizeof(*prev),NULL),curr->prevHash);
+		if(hashCompare(SHA256(toString(*prev),sizeof(*prev),NULL),curr->prevHash))
 			printf("Verified!\n");
 		else
 			printf("Verification Failed!\n");
@@ -111,7 +112,7 @@ void hackChain()
 		curr=curr->link;
 		if(!curr)
 			return;
-		if (!hashCompare(SHA256(toString(*prev),sizeof(*prev),NULL),curr->prevHash));
+		if (!hashCompare(SHA256(toString(*prev),sizeof(*prev),NULL),curr->prevHash))
 		{
 			hashPrinter(
 					SHA256(toString(*prev),sizeof(*prev),curr->prevHash),
