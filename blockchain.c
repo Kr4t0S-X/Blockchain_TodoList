@@ -5,7 +5,18 @@
 #include "openssl/crypto.h"
 #include "openssl/sha.h"
 
-#define SHA256_DIGEST_LENGTH 32
+//Regular bold text
+#define BBLK "\e[1;30m"
+#define BRED "\e[1;31m"
+#define BGRN "\e[1;32m"
+#define BYEL "\e[1;33m"
+#define BBLU "\e[1;34m"
+#define BMAG "\e[1;35m"
+#define BCYN "\e[1;36m"
+#define BWHT "\e[1;37m"
+#define reset "\e[0m"
+
+//#define SHA256_DIGEST_LENGTH 32
 
 struct block
 {
@@ -60,10 +71,11 @@ void verifyChain()
 		hashPrinter(SHA256(toString(*prev),sizeof(*prev), NULL),SHA256_DIGEST_LENGTH);
 		printf(" - ");
 		hashPrinter(curr->prevHash,SHA256_DIGEST_LENGTH);
+		printf(" - ");
 		if(hashCompare(SHA256(toString(*prev),sizeof(*prev),NULL),curr->prevHash))
-			printf("Verified!\n");
+			printf(BGRN "Verified!\n" reset);
 		else
-			printf("Verification Failed!\n");
+			printf(BRED "Verification Failed!\n" reset);
 		prev=curr;
 		curr=curr->link;
 	}
