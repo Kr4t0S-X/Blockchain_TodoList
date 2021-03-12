@@ -3,6 +3,7 @@
 #include "string.h"
 #include "stdlib.h"
 #include "openssl/crypto.h"
+#include "openssl/sha.h"
 
 #define SHA256_DIGEST_LENGTH 32
 
